@@ -7,6 +7,14 @@
       "topic": "Boxing",
       "description": "Another part of my life, outside the day job. Thoughts on boxing and combat sports as I keep learning.",
       "intro": "Boxing and combat sports are interests I want to give their own space here.\n\nI’ll use this page to share thoughts, updates, and things I’m picking up along the way. Related posts from the journal will live here too."
+    },
+    {
+      "slug": "nyc",
+      "title": "NYC",
+      "heading": "Life in New York in my 20s.",
+      "topic": "NYC",
+      "description": "General life thoughts, new interests, and figuring things out as a 20-something in New York.",
+      "intro": "I wanted this site to have room for the everyday side of my life in New York, too.\n\nThis is where I’ll share personal thoughts, updates, and things I’m learning or picking up in my 20s, beyond the work and the technical topics."
     }
   ]
 }

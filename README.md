@@ -1,6 +1,6 @@
 # Ram Vegiraju · Personal website
 
-A personal home for professional work, writing, boxing, and YouTube videos. Built with Astro, Markdown, and Decap CMS. Dark navy and copper by default, with a persistent light theme. Uses a real GitHub profile photo and the supplied resume.
+A personal home for professional work, writing, boxing, YouTube videos, and life in New York. Built with Astro, Markdown, and Decap CMS. Dark navy and copper by default, with a persistent light theme. Uses Ram's supplied portrait and resume.
 
 ## Run locally
 
@@ -25,6 +25,7 @@ Set `SITE_URL` to the real canonical HTTPS origin before production deployment. 
 ## Features and editing
 
 - A concise Home, a dedicated Professional page, and interest tabs starting with Boxing. Includes resume download and profile links.
+- A portrait-centered homepage map with clickable Professional, Boxing, Writing, Videos, and NYC branches. Connections highlight on hover or keyboard focus; mobile uses a compact linked layout. New interests join the map automatically.
 - Writing archive with Life, Boxing, AI/ML, and Updates filters; permanent article URLs, RSS, sitemap, and social metadata.
 - Video library with All videos / Learning paths, AWS/Databricks filters, search, incremental display, and ordered playlist pages.
 - Players load on click using privacy-enhanced YouTube embeds; every player has a YouTube fallback link.
@@ -67,6 +68,8 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 | [src/content/publication.ts](src/content/publication.ts) | Shared draft and publication-date rule. |
 | [src/pages/rss.xml.ts](src/pages/rss.xml.ts) | Published-post RSS feed. |
 | [src/components/VideoCard.astro](src/components/VideoCard.astro) | Accessible click-to-load video player and metadata. |
+| [src/components/InterestMap.astro](src/components/InterestMap.astro) | Responsive portrait-centered navigation diagram, generated from shared interests. |
+| [src/assets/profile.png](src/assets/profile.png) | Supplied original portrait; Astro generates optimized WebP versions for the map and social previews. |
 | [src/lib/youtube.ts](src/lib/youtube.ts) | Typed, freshness-checked video data and curated fallback. |
 | [src/lib/youtube-utils.mjs](src/lib/youtube-utils.mjs) | Pagination, platform labels, normalization, and metadata expiry. |
 | [src/data/youtube.config.json](src/data/youtube.config.json) | Channel and learning-path selection configuration. |
@@ -75,7 +78,7 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 | [scripts/verify-build.mjs](scripts/verify-build.mjs) | Checks built pages for broken local links, page landmarks, credential patterns, and leaked drafts. |
 | [public/admin/](public/admin/) | Decap browser editor, fields, and preview styles. |
 | [public/resume.pdf](public/resume.pdf) | Downloadable supplied resume. |
-| [public/images/](public/images/) | GitHub profile photo and future post uploads. |
+| [public/images/](public/images/) | Original GitHub avatar retained as an asset, and future post uploads. |
 | [netlify/](netlify/) | Server-side GitHub OAuth flow for the blog editor. |
 | [netlify.toml](netlify.toml) | Public hosting build, function routes, and response headers. |
 | [.github/workflows/](.github/workflows/) | CI checks and scheduled YouTube metadata refresh. |

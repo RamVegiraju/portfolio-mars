@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/profile.png';
+import { interests } from '../data/interests.json';
+
+const branches = [
+  { key: 'professional', title: 'Professional', description: 'Applied ML, teaching & the day job', href: '/professional/', icon: 'work' },
+  ...interests.filter(interest => interest.slug === 'boxing').map(interest => ({ key: interest.slug, title: interest.title, description: 'Boxing & combat sports', href: `/${interest.slug}/`, icon: 'boxing' })),
+  { key: 'writing', title: 'Writing', description: 'Thoughts, notes & figuring things out', href: '/writing/', icon: 'writing' },
+  { key: 'videos', title: 'Videos', description: 'Sharing what I learn, on camera', href: '/videos/', icon: 'videos' },
+  ...interests.filter(interest => interest.slug !== 'boxing').map(interest => ({ key: interest.slug, title: interest.title, description: interest.slug === 'nyc' ? 'New York, my 20s & life in between' : interest.description, href: `/${interest.slug}/`, icon: interest.slug === 'nyc' ? 'city' : 'interest' })),
+];
+const height = branches.length <= 5 ? 520 : Math.max(600, Math.ceil(branches.length / 2) * 160);
+const center = { x: 500, y: branches.length <= 5 ? 245 : height / 2 };
+const anchors = [{ x: 200, y: 104 }, { x: 800, y: 104 }, { x: 150, y: 343 }, { x: 850, y: 343 }, { x: 500, y: 474 }];
+const nodes = branches.map((branch, index) => {
+  const side = index % 2;
+  const rows = Math.ceil((branches.length - side) / 2);
+  const anchor = branches.length <= 5 ? anchors[index] : { x: side ? 850 : 150, y: (Math.floor(index / 2) + .5) * height / rows };
+  const dx = anchor.x - center.x;
+  const dy = anchor.y - center.y;
+  const angle = Math.atan2(dy, dx);
+  const start = { x: center.x + Math.cos(angle) * 115, y: center.y + Math.sin(angle) * 115 };
+  const bottom = anchor.x === center.x;
+  const end = { x: bottom ? anchor.x : anchor.x + (dx < 0 ? 120 : -120), y: bottom ? anchor.y - 47 : anchor.y };
+  const path = bottom
+    ? `M ${start.x} ${start.y} C ${start.x} ${start.y + 35}, ${end.x} ${end.y - 35}, ${end.x} ${end.y}`
+    : `M ${start.x} ${start.y} C ${(start.x + end.x) / 2} ${start.y}, ${(start.x + end.x) / 2} ${end.y}, ${end.x} ${end.y}`;
+  return { ...branch, ...anchor, path };
+});
+---
+<nav class="interest-map" aria-label="Explore the different sides of Ram" style={`--map-height:${height}px;--portrait-y:${center.y / height * 100}%`}>
+  <svg class="map-connections" viewBox={`0 0 1000 ${height}`} preserveAspectRatio="none" fill="none" aria-hidden="true">
+    {nodes.map(node => <path class="map-line" d={node.path} data-branch-line={node.key} />)}
+  </svg>
+  <figure class="map-center">
+    <div class="portrait-ring"><Image src={portrait} alt="Ram Vegiraju" widths={[320, 520, 780]} sizes="(max-width:700px) 190px, 230px" width={520} format="webp" loading="eager" fetchpriority="high" /></div>
+    <figcaption>Still learning. Still becoming.</figcaption>
+  </figure>
+  <ul class="map-branches">
+    {nodes.map(node => <li class="map-branch" style={`--node-x:${node.x / 10}%;--node-y:${node.y / height * 100}%`}>
+      <a class="map-node" href={node.href} data-branch={node.key}>
+        <span class="node-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            {node.icon === 'work' && <><rect x="5" y="10" width="22" height="17" rx="3"/><path d="M11 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3M5 17c7 4 15 4 22 0M14 18h4v4h-4z"/></>}
+            {node.icon === 'boxing' && <><path d="M11 22c-4-1-6-4-6-8 0-3 2-5 4-4V8c0-4 4-6 8-6 6 0 9 4 9 10v5c0 3-2 5-5 6v5H11zM11 22h10M9 10v6c0 2 1 3 3 3M12 26h8"/></>}
+            {node.icon === 'writing' && <><path d="m20 5 7 7-14 14-9 2 2-9zM17 8l7 7M6 19l7 7M20 5l2-2a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3l-2 2"/></>}
+            {node.icon === 'videos' && <><rect x="3" y="6" width="26" height="20" rx="5"/><path d="m13 11 8 5-8 5z"/></>}
+            {node.icon === 'city' && <><path d="M3 28h26M6 28V16h6v12M12 28V8h8v20M20 28V13h6v15M16 8V3M15 12h2m-2 5h2m-2 5h2M9 20v3m14-6v3m0 3v2"/></>}
+            {node.icon === 'interest' && <><circle cx="16" cy="16" r="12"/><path d="m20 10-2 8-8 4 3-9z"/></>}
+          </svg>
+        </span>
+        <span class="node-copy"><span class="node-title">{node.title}</span><span class="node-description">{node.description}</span></span>
+      </a>
+    </li>)}
+  </ul>
+</nav>
+<script>
+  document.querySelectorAll<HTMLElement>('.interest-map').forEach(map => {
+    const lines = [...map.querySelectorAll<SVGPathElement>('[data-branch-line]')];
+    const highlight = (key?: string) => lines.forEach(line => line.classList.toggle('is-active', line.dataset.branchLine === key));
+    map.querySelectorAll<HTMLAnchorElement>('[data-branch]').forEach(link => {
+      link.addEventListener('pointerenter', () => highlight(link.dataset.branch));
+      link.addEventListener('pointerleave', () => highlight());
+      link.addEventListener('focus', () => highlight(link.dataset.branch));
+      link.addEventListener('blur', () => highlight());
+    });
+  });
+</script>
+<style>
+  .interest-map{position:relative;height:var(--map-height);max-width:1080px;margin:1.5rem auto 0;isolation:isolate}.map-connections{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.map-line{stroke:var(--accent);stroke-width:1.2;opacity:.4;vector-effect:non-scaling-stroke;transition:opacity .2s,stroke-width .2s}.map-line.is-active{opacity:1;stroke-width:2}.map-center{position:absolute;left:50%;top:var(--portrait-y);transform:translate(-50%,-50%);margin:0;width:230px;z-index:1}.portrait-ring{width:230px;height:230px;border-radius:50%;padding:8px;border:1px solid var(--accent);background:var(--bg);box-shadow:0 0 0 12px var(--bg)}.portrait-ring img{width:100%;height:100%;object-fit:cover;object-position:50% 43%;border-radius:50%;filter:saturate(.85)}.map-center figcaption{position:absolute;top:calc(100% + 15px);left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--muted);background:var(--bg);padding:0 .6rem}.map-branches{list-style:none;margin:0;padding:0}.map-branch{position:absolute;left:var(--node-x);top:var(--node-y);width:240px;transform:translate(-50%,-50%)}.map-node{display:flex;gap:1rem;align-items:center;min-height:96px;padding:1rem 1.1rem;border:1px solid var(--border);border-radius:12px;background:var(--bg);transition:background .2s,border-color .2s,transform .2s;box-shadow:0 0 0 8px var(--bg)}.map-node:hover,.map-node:focus-visible{border-color:var(--accent);background:var(--surface);color:var(--text);transform:translateY(-3px)}.node-icon{width:30px;height:32px;flex-shrink:0;color:var(--accent)}.node-icon svg{width:100%;height:100%}.node-copy{min-width:0;display:block}.node-title{display:block;font-family:var(--serif);font-size:1.7rem;line-height:1.2;margin-bottom:.4rem}.node-description{display:block;font-size:.875rem;color:var(--muted);line-height:1.55}.map-node:hover .node-title{color:var(--accent)}
+  @media(max-width:1050px) and (min-width:701px){.map-branch{width:210px}.map-node{padding:.8rem;gap:.7rem}.node-title{font-size:1.5rem}.node-icon{width:26px}.map-center,.portrait-ring{width:200px}.portrait-ring{height:200px}.node-description{font-size:.875rem}}
+  @media(max-width:700px){.interest-map{height:auto;margin-top:2rem}.map-connections{display:none}.map-center{position:relative;left:auto;top:auto;transform:none;width:190px;margin:0 auto 3.5rem}.portrait-ring{width:190px;height:190px;padding:6px;box-shadow:0 0 0 8px var(--bg)}.map-center figcaption{font-size:1rem;top:calc(100% + 12px)}.map-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;padding-top:1.7rem;position:relative}.map-branches::before{content:'';position:absolute;top:-1rem;height:2.7rem;left:50%;border-left:1px solid var(--accent);opacity:.45}.map-branches::after{content:'';position:absolute;top:.7rem;left:25%;right:25%;height:1rem;border:1px solid var(--accent);border-bottom:0;opacity:.45;z-index:-1}.map-branch{position:relative;left:auto;top:auto;transform:none;width:auto;display:flex}.map-branch:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - .5rem);justify-self:center}.map-node{width:100%;display:block;padding:1.15rem;min-height:162px;border-radius:8px;box-shadow:none}.node-icon{display:block;margin-bottom:.8rem;width:26px;height:28px}.node-title{font-size:1.5rem}.node-description{font-size:.875rem}.map-node:hover{transform:none}}
+</style>

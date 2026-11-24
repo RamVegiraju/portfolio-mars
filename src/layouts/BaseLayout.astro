@@ -1,8 +1,11 @@
 ---
 import '../styles/global.css';
 import { navigation } from '../data/navigation';
+import { getImage } from 'astro:assets';
+import profile from '../assets/profile.png';
+const profileImage = await getImage({ src: profile, width: 800, height: 800, fit: 'cover', format: 'webp' });
 interface Props { title?: string; description?: string; active?: string; image?: string; imageAlt?: string; type?: 'website' | 'article'; publishedTime?: string; }
-const { title = 'Ram Vegiraju — Work, words & everything else', description = 'A personal home for my work in AI/ML, the videos I make, and thoughts on life and boxing.', active = '', image = '/images/ram-vegiraju.jpg', imageAlt = 'Ram Vegiraju', type = 'website', publishedTime } = Astro.props;
+const { title = 'Ram Vegiraju — Work, words & everything else', description = 'A personal home for my work in AI/ML, boxing, writing, videos, and life in New York in my 20s.', active = '', image = profileImage.src, imageAlt = 'Ram Vegiraju', type = 'website', publishedTime } = Astro.props;
 const pageTitle = title.includes('Ram Vegiraju') ? title : `${title} — Ram Vegiraju`;
 const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
 ---
