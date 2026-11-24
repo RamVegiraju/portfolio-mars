@@ -9,17 +9,17 @@ const posts = (await getCollection('posts', ({data}) => isPublished(data))).sort
 const featured = videos.find(video => video.platform === 'Databricks') || videos[0];
 ---
 <BaseLayout active="home">
-  <section class="home-intro container"><span class="eyebrow">AI / ML · Boxing · Life in New York in my 20s</span><h1>Ram Vegiraju<span>.</span></h1><p class="home-description">Hey everyone, I’m Ram. I made this space to share what I’m learning and picking up along the way, from AI/ML and teaching to boxing and life as a 20-something in New York.</p><p class="map-hint">A few sides of me. Pick one to explore.</p><InterestMap /></section>
+  <section class="home-intro container"><span class="eyebrow">AI / ML · Boxing · Life in New York in my 20s</span><h1>Ram Vegiraju<span>.</span></h1><p class="home-description">Hey everyone, I’m Ram. I made this space to share what I’m learning and picking up along the way, from AI/ML and teaching to boxing and life as a 20-something in New York.</p><p class="map-hint">Explore my interests.</p><InterestMap /></section>
   <section class="writing-section container">
-    <div class="section-heading"><div><span class="eyebrow">Notes & longer thoughts</span><h2>From the journal</h2></div><a class="text-link" href="/writing/">All writing</a></div>
+    <div class="section-heading"><div><span class="eyebrow">Writing</span><h2>Recent posts</h2></div><a class="text-link" href="/writing/">All writing</a></div>
     <div class="journal-layout">
       <div class="journal-intro"><p>Mostly personal. Sometimes technical. Thoughts on life in New York in my 20s, and what I’m learning, making, and figuring out along the way.</p><div class="topic-list"><span>Life</span><span>Boxing</span><span>AI / ML</span></div></div>
       <div class="post-list">{posts.map(post => <a class="post-row" href={`/writing/${post.id}/`}><div class="post-meta"><span>{post.data.topics.join(' / ')}</span><time datetime={post.data.date.toISOString()}>{post.data.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}</time></div><h3>{post.data.title}</h3><p>{post.data.description}</p><span class="read-label">Read the post</span></a>)}</div>
     </div>
   </section>
   <section class="video-section container">
-    <div class="section-heading"><div><span class="eyebrow">Watch & learn</span><h2>A different way to share</h2></div><a class="text-link" href="/videos/">Explore videos</a></div>
-    <div class="video-feature">{featured && <VideoCard video={featured} featured />}<div class="video-feature-copy"><span class="eyebrow">On YouTube</span><h3>Ideas are better<br /><em>when shared.</em></h3><p>Videos on AI, machine learning, and the tools I work with. Browse recent uploads or follow a learning path through AWS and Databricks.</p><a class="button secondary" href="/videos/?view=paths">Find a learning path</a></div></div>
+    <div class="section-heading"><div><span class="eyebrow">YouTube</span><h2>Featured video</h2></div><a class="text-link" href="/videos/">Explore videos</a></div>
+    <div class="video-feature">{featured && <VideoCard video={featured} featured />}<div class="video-feature-copy"><span class="eyebrow">On YouTube</span><h3>AWS & Databricks</h3><p>Videos on AI, machine learning, and the tools I work with. Browse recent uploads or follow a learning path through AWS and Databricks.</p><a class="button secondary" href="/videos/?view=paths">Find a learning path</a></div></div>
   </section>
 
 </BaseLayout>

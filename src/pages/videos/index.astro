@@ -6,7 +6,7 @@ import { videos, learningPaths, channelUrl, hasFreshYouTubeData } from '../../li
 <BaseLayout title="Videos" description="Videos and learning paths on AI, machine learning, AWS, and Databricks by Ram Vegiraju." active="videos">
   <div class="container video-library">
     <header class="library-header">
-      <div><p class="eyebrow">Watch & learn</p><h1 class="page-title">A few things,<br /><em>better explained.</em></h1><p class="lede">Practical ideas, walkthroughs, and the occasional deep dive.<br class="desktop-break" /> Explore a single video or follow a learning path.</p></div>
+      <div><p class="eyebrow">Watch & learn</p><h1 class="page-title">Videos &<br /><em>learning paths.</em></h1><p class="lede">Practical ideas, walkthroughs, and the occasional deep dive.<br class="desktop-break" /> Explore a single video or follow a learning path.</p></div>
       <a class="channel-link" href={channelUrl} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.5 7.1a3 3 0 0 0-2.1-2.1C17.5 4.5 12 4.5 12 4.5s-5.5 0-7.4.5A3 3 0 0 0 2.5 7.1 31 31 0 0 0 2 12a31 31 0 0 0 .5 4.9A3 3 0 0 0 4.6 19c1.9.5 7.4.5 7.4.5s5.5 0 7.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22 12a31 31 0 0 0-.5-4.9ZM10 15.5v-7l6 3.5-6 3.5Z" /></svg> YouTube channel</a>
     </header>
 
@@ -35,7 +35,7 @@ import { videos, learningPaths, channelUrl, hasFreshYouTubeData } from '../../li
         <a class="path-image" href={`/videos/paths/${path.slug}/`} tabindex="-1" aria-hidden="true"><img src={path.thumbnail} alt="" loading="lazy" width="480" height="270" /><span class="path-count">{path.videos.length} videos</span></a>
         <div class="path-copy"><p class="path-platform">{path.platform} · Learning path</p><h2><a href={`/videos/paths/${path.slug}/`}>{path.title}</a></h2><p class="path-description">{path.description || 'Follow this playlist in order, or jump into the topics that interest you.'}</p><a class="text-link" href={`/videos/paths/${path.slug}/`}>Explore learning path</a></div>
       </article>)}</div>
-      <div class="empty-state" data-empty="paths" hidden={learningPaths.length > 0}><h2>{learningPaths.length ? 'No matching learning paths.' : 'More ways to learn, coming together.'}</h2><p>{learningPaths.length ? 'Try another platform or search.' : 'AWS and Databricks playlists will appear here as learning paths. In the meantime, explore the channel playlists.'}</p><a class="text-link" href={`${channelUrl}/playlists`} target="_blank" rel="noopener noreferrer">Browse playlists on YouTube</a></div>
+      <div class="empty-state" data-empty="paths" hidden={learningPaths.length > 0}><h2>{learningPaths.length ? 'No matching learning paths.' : 'No learning paths yet.'}</h2><p>{learningPaths.length ? 'Try another platform or search.' : 'AWS and Databricks playlists will appear here as learning paths. In the meantime, explore the channel playlists.'}</p><a class="text-link" href={`${channelUrl}/playlists`} target="_blank" rel="noopener noreferrer">Browse playlists on YouTube</a></div>
     </section>
 
     <aside class="channel-footer"><div><p class="eyebrow">Keep exploring</p><h2>There’s more on the channel.</h2><p>Browse the full archive and subscribe for new videos.</p></div><a class="button" href={channelUrl} target="_blank" rel="noopener noreferrer">Visit YouTube</a></aside>

@@ -56,7 +56,7 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 | File or directory | Purpose |
 | --- | --- |
 | [src/pages/index.astro](src/pages/index.astro) | Short personal introduction, recent writing, featured video, and links to work and interests. |
-| [src/pages/professional.astro](src/pages/professional.astro) | Career, technical focus, education, teaching, and resume links. |
+| [src/pages/professional.astro](src/pages/professional.astro) | Resume-based career summaries, categorized tech stack, education, teaching, and resume links. |
 | [src/pages/[interest].astro](src/pages/[interest].astro) | Generates each interest page with its introduction and matching published posts. |
 | [src/data/interests.json](src/data/interests.json) | Editable interest definitions; each entry creates a page, navigation tab, and homepage link. |
 | [src/data/navigation.ts](src/data/navigation.ts) | Shared primary navigation built from the fixed pages and editable interests. |

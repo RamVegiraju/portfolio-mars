@@ -14,7 +14,7 @@ const posts = (await getCollection('posts', ({data}) => isPublished(data) && dat
 ---
 <BaseLayout title={interest.title} description={interest.description} active={interest.slug}>
   <section class="container interest-header">
-    <span class="eyebrow">{interest.slug === 'boxing' ? 'Boxing & combat sports' : 'A little more of my life'}</span>
+    <span class="eyebrow">{interest.slug === 'boxing' ? 'Boxing & combat sports' : interest.title}</span>
     <h1 class="page-title">{interest.heading}</h1>
     <p class="lede">{interest.description}</p>
   </section>
