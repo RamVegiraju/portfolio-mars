@@ -27,6 +27,7 @@ Set `SITE_URL` to the real canonical HTTPS origin before production deployment. 
 - A concise Home, a dedicated Professional page, and interest tabs starting with Boxing. Includes resume download and profile links.
 - A portrait-centered homepage map with clickable Professional, Boxing, Writing, Videos, and NYC branches. Connections highlight on hover or keyboard focus; mobile uses a compact linked layout. New interests join the map automatically.
 - Boxing has a personal timeline from January 2024 through the goal of a 2027 amateur fight, including the first-day photo, late-2024 and 2025 sparring clips, and 2026 sparring/mitt-work clips. The early clip includes a personal note and Instagram link for coach Scrap. Videos use native controls and load only on demand.
+- NYC includes the supplied introduction, an interactive neighborhood-history map, cuisine-filtered restaurants, and separate cocktail/speakeasy and club/venue lists. Personal favorites are ready to populate; optional city photos render when added.
 - Writing archive with Life, Boxing, AI/ML, and Updates filters; permanent article URLs, RSS, sitemap, and social metadata.
 - Video library with All videos / Learning paths, AWS/Databricks filters, search, incremental display, and ordered playlist pages.
 - Players load on click using privacy-enhanced YouTube embeds; every player has a YouTube fallback link.
@@ -34,7 +35,7 @@ Set `SITE_URL` to the real canonical HTTPS origin before production deployment. 
 
 To add another interest, use **Site settings → Interests and tabs** in the configured editor, or edit `src/data/interests.json`. Set a unique URL name, title, heading, topic, description, and introduction. Publishing the settings generates the new page, tab, and homepage link on the next build. Tag a post with the matching topic to show it on that interest page and in Writing. `/about/` redirects to Home.
 
-Read [blog editing](docs/blog.md), [YouTube syncing](docs/youtube.md), [boxing timeline and media](docs/boxing.md), and [production publishing](docs/publishing.md) for the exact workflows. The initial journal introduction is starter copy for review, not a collection of invented personal essays. The example draft is excluded from the public build.
+Read [blog editing](docs/blog.md), [YouTube syncing](docs/youtube.md), [boxing timeline and media](docs/boxing.md), [NYC guide editing](docs/nyc.md), and [production publishing](docs/publishing.md) for the exact workflows. The initial journal introduction is starter copy for review, not a collection of invented personal essays. The example draft is excluded from the public build.
 
 The GitHub repository is currently **public**. Unpublished Decap drafts are stored on repository branches and can be read on GitHub. Use a private repository or configure a private content repository before adding private drafts. The source remains public unless you choose to change it.
 
@@ -70,6 +71,11 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 | [src/pages/rss.xml.ts](src/pages/rss.xml.ts) | Published-post RSS feed. |
 | [src/components/VideoCard.astro](src/components/VideoCard.astro) | Accessible click-to-load video player and metadata. |
 | [src/components/InterestMap.astro](src/components/InterestMap.astro) | Responsive portrait-centered navigation diagram, generated from shared interests. |
+| [src/components/NYCSection.astro](src/components/NYCSection.astro) | NYC introduction, cuisine filters, personal favorites, nightlife categories, and optional photographs. |
+| [src/components/NYCMap.astro](src/components/NYCMap.astro) | Interactive Leaflet neighborhood map with synchronized history controls and fallback links. |
+| [src/data/nyc.json](src/data/nyc.json), [src/data/nyc.ts](src/data/nyc.ts) | Editable NYC guide and build-time content validation. |
+| [src/data/nyc-neighborhoods.json](src/data/nyc-neighborhoods.json) | Neighborhood dates and NYC Planning reference coordinates. |
+| [src/lib/nyc-favorites.ts](src/lib/nyc-favorites.ts) | Shared favorites types, restaurant filtering, and safe outbound links. |
 | [src/components/BoxingJourney.astro](src/components/BoxingJourney.astro) | Boxing timeline, supplied photographs, training video players, and Instagram archive link. |
 | [src/data/boxing-journey.json](src/data/boxing-journey.json) | Editable timeline text, milestone dates, and Instagram link. |
 | [src/assets/profile.png](src/assets/profile.png) | Supplied original portrait; Astro generates optimized WebP versions for the map and social previews. |
@@ -88,7 +94,7 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 | [netlify/](netlify/) | Server-side GitHub OAuth flow for the blog editor. |
 | [netlify.toml](netlify.toml) | Public hosting build, function routes, and response headers. |
 | [.github/workflows/](.github/workflows/) | CI checks and scheduled YouTube metadata refresh. |
-| [tests/](tests/) | Focused OAuth, video-data, and video-library regression tests. |
+| [tests/](tests/) | Focused OAuth, video-data, video-library, and NYC favorites regression tests. |
 | [docs/](docs/) | Authoring, video management, and deployment setup. |
 | [astro.config.mjs](astro.config.mjs) | Static build, canonical origin, and sitemap integration. |
 | [.env.example](.env.example) | Variable names and placeholders only. |

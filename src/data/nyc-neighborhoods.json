@@ -1,0 +1,6 @@
+[
+  { "id": "turtle-bay", "name": "Turtle Bay", "period": "2022", "lat": 40.7520506, "lng": -73.9677097, "radius": 450 },
+  { "id": "murray-hill", "name": "Murray Hill", "period": "2023–2024", "lat": 40.7483113, "lng": -73.9783335, "radius": 450 },
+  { "id": "hells-kitchen", "name": "Hell’s Kitchen", "period": "2024–2026", "lat": 40.7591092, "lng": -73.9961208, "radius": 650 },
+  { "id": "downtown-brooklyn", "name": "Downtown Brooklyn", "period": "2026–Present", "lat": 40.6908523, "lng": -73.9834648, "radius": 550 }
+]

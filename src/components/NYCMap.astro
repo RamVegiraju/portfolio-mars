@@ -1,0 +1,150 @@
+---
+import neighborhoods from '../data/nyc-neighborhoods.json';
+---
+<section class="nyc-map-section" aria-label="Map of neighborhoods I’ve lived in" data-nyc-map>
+  <div class="map-heading"><button type="button" class="map-overview" data-map-overview aria-pressed="true" disabled>Show all</button></div>
+  <div class="map-layout">
+    <div class="map-panel">
+      <div class="map-canvas" data-map-canvas role="region" aria-label="Interactive map of the NYC neighborhoods I’ve lived in" aria-describedby="nyc-map-instructions"><p class="map-loading" data-map-loading>The map loads here. Neighborhood links are listed below.</p></div>
+      <div class="map-caption"><p id="nyc-map-instructions">Select a neighborhood to focus. Highlighted circles show approximate areas.</p><button type="button" class="pan-toggle" data-map-panning aria-pressed="false" disabled>Enable dragging</button></div>
+      <p class="map-status" data-map-status aria-live="polite">{neighborhoods.map(neighborhood => neighborhood.name).join(', ')}.</p>
+    </div>
+    <ol class="neighborhood-list" aria-label="Neighborhood history">
+      {neighborhoods.map(neighborhood => <li>
+        <button type="button" data-neighborhood={neighborhood.id} aria-pressed="false" disabled><span class="neighborhood-name">{neighborhood.name}</span><span class="neighborhood-period">{neighborhood.period}</span></button>
+        <a href={`https://www.openstreetmap.org/?mlat=${neighborhood.lat}&mlon=${neighborhood.lng}#map=15/${neighborhood.lat}/${neighborhood.lng}`} target="_blank" rel="noopener noreferrer" aria-label={`View ${neighborhood.name} on OpenStreetMap`}>Open map</a>
+      </li>)}
+    </ol>
+  </div>
+  <noscript><p class="map-noscript">Use the Open map links to explore each neighborhood. The dates above remain available without JavaScript.</p></noscript>
+</section>
+<script>
+  import neighborhoods from '../data/nyc-neighborhoods.json';
+
+  async function initializeMap(root: HTMLElement) {
+    const canvas = root.querySelector<HTMLElement>('[data-map-canvas]');
+    const status = root.querySelector<HTMLElement>('[data-map-status]');
+    const loading = root.querySelector<HTMLElement>('[data-map-loading]');
+    if (!canvas) return;
+    try {
+      const L = await import('leaflet');
+      await import('leaflet/dist/leaflet.css');
+      loading?.remove();
+      const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+      const map = L.map(canvas, { scrollWheelZoom: false, dragging: !coarsePointer, tapHold: false, minZoom: 9, maxZoom: 19, zoomControl: true });
+      // Circle bounds depend on Leaflet's projected view; initialize it before adding vector layers.
+      map.fitBounds(L.latLngBounds(neighborhoods.map(item => [item.lat, item.lng] as import('leaflet').LatLngTuple)), { padding: [70, 45], maxZoom: 13, animate: false });
+      let selected: string | undefined;
+      let loadedTiles = 0;
+      let failedTiles = 0;
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      });
+      const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-neighborhood]')];
+      const overview = root.querySelector<HTMLButtonElement>('[data-map-overview]');
+      const pan = root.querySelector<HTMLButtonElement>('[data-map-panning]');
+      const circles = new Map<string, import('leaflet').Circle>();
+      const points = new Map<string, import('leaflet').CircleMarker>();
+      const directions: Record<string, import('leaflet').Direction> = { 'turtle-bay': 'right', 'murray-hill': 'left', 'hells-kitchen': 'left', 'downtown-brooklyn': 'right' };
+      const colors = () => {
+        const style = getComputedStyle(document.documentElement);
+        return { accent: style.getPropertyValue('--accent').trim(), background: style.getPropertyValue('--bg').trim() };
+      };
+      const paint = () => {
+        const { accent, background } = colors();
+        circles.forEach((circle, id) => circle.setStyle({ color: accent, fillColor: accent, weight: id === selected ? 2.5 : 1.5, fillOpacity: id === selected ? .28 : .11, opacity: selected && id !== selected ? .5 : .9 }));
+        points.forEach((point, id) => point.setStyle({ color: background, fillColor: accent, weight: 2, fillOpacity: 1, opacity: 1 }).setRadius(id === selected ? 7 : 5));
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.neighborhood === selected)));
+        overview?.setAttribute('aria-pressed', String(!selected));
+      };
+      const focusNeighborhood = (id: string) => {
+        const neighborhood = neighborhoods.find(item => item.id === id);
+        const circle = circles.get(id);
+        if (!neighborhood || !circle) return;
+        selected = id;
+        paint();
+        map.fitBounds(circle.getBounds(), { padding: [45, 45], maxZoom: 15, animate: !window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+        const popup = document.createElement('div');
+        const heading = document.createElement('strong');
+        heading.textContent = neighborhood.name;
+        const period = document.createElement('div');
+        period.textContent = neighborhood.period;
+        popup.append(heading, period);
+        L.popup({ autoPan: true, closeButton: true }).setLatLng([neighborhood.lat, neighborhood.lng]).setContent(popup).openOn(map);
+        if (status) status.textContent = `${neighborhood.name} · ${neighborhood.period}`;
+      };
+      neighborhoods.forEach(neighborhood => {
+        const point: import('leaflet').LatLngTuple = [neighborhood.lat, neighborhood.lng];
+        const circle = L.circle(point, { radius: neighborhood.radius }).addTo(map);
+        const marker = L.circleMarker(point).addTo(map);
+        circle.on('click', () => focusNeighborhood(neighborhood.id));
+        marker.on('click', () => focusNeighborhood(neighborhood.id));
+        marker.bindTooltip(neighborhood.name, { permanent: true, direction: directions[neighborhood.id] || 'top', className: 'nyc-map-label', opacity: 1 });
+        // Leaflet creates vector elements only after the map receives its first view.
+        const enableKeyboard = () => {
+          const element = marker.getElement();
+          if (!element || element.hasAttribute('data-keyboard-ready')) return;
+          element.setAttribute('data-keyboard-ready', 'true');
+          element.setAttribute('tabindex', '0');
+          element.setAttribute('role', 'button');
+          element.setAttribute('aria-label', `Focus ${neighborhood.name}, ${neighborhood.period}`);
+          element.addEventListener('keydown', event => {
+            if (event instanceof KeyboardEvent && ['Enter', ' '].includes(event.key)) { event.preventDefault(); focusNeighborhood(neighborhood.id); }
+          });
+        };
+        marker.on('add', enableKeyboard);
+        enableKeyboard();
+        circles.set(neighborhood.id, circle);
+        points.set(neighborhood.id, marker);
+      });
+      const bounds = L.featureGroup([...circles.values()]).getBounds();
+      const showAll = () => {
+        selected = undefined;
+        map.closePopup();
+        map.fitBounds(bounds, { padding: [70, 45], maxZoom: 13, animate: false });
+        paint();
+        if (status) status.textContent = 'Showing all neighborhoods.';
+      };
+      buttons.forEach(button => { button.disabled = false; button.addEventListener('click', () => focusNeighborhood(button.dataset.neighborhood || '')); });
+      if (overview) { overview.disabled = false; overview.addEventListener('click', showAll); }
+      if (pan) {
+        pan.disabled = false;
+        pan.setAttribute('aria-pressed', String(!coarsePointer));
+        pan.textContent = coarsePointer ? 'Enable dragging' : 'Disable dragging';
+        pan.addEventListener('click', () => {
+          const enabled = map.dragging.enabled();
+          if (enabled) map.dragging.disable(); else map.dragging.enable();
+          pan.setAttribute('aria-pressed', String(!enabled));
+          pan.textContent = enabled ? 'Enable dragging' : 'Disable dragging';
+        });
+      }
+      tiles.on('tileload', () => { loadedTiles++; });
+      tiles.on('tileerror', () => { failedTiles++; });
+      tiles.on('load', () => { if (!loadedTiles && failedTiles && status) status.textContent = 'Street tiles are unavailable. The highlighted areas and neighborhood links still work.'; });
+      showAll();
+      // Request tiles only after the final overview bounds are established.
+      tiles.addTo(map);
+      new MutationObserver(paint).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      const observer = new ResizeObserver(() => map.invalidateSize({ animate: false }));
+      observer.observe(canvas);
+    } catch {
+      canvas.classList.add('map-unavailable');
+      if (loading) loading.textContent = 'The interactive map could not load. Use the neighborhood links below.';
+      else canvas.textContent = 'The interactive map could not load. Use the neighborhood links below.';
+      if (status) status.textContent = 'Neighborhood names, dates, and map links remain available.';
+    }
+  }
+  document.querySelectorAll<HTMLElement>('[data-nyc-map]').forEach(root => {
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); void initializeMap(root); } }, { rootMargin: '200px' });
+      observer.observe(root);
+    } else void initializeMap(root);
+  });
+</script>
+<style>
+  .nyc-map-section{padding-top:0}.map-heading{display:flex;justify-content:flex-end;align-items:center;gap:1.5rem;margin-bottom:1.5rem}.map-heading h2{font-family:var(--serif);font-size:2.8rem;font-weight:400;margin:0 0 .65rem}.map-heading p{margin:0;font-size:1rem}.map-overview,.pan-toggle{font:inherit;font-size:.875rem;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:.6rem 1rem;min-height:44px}.map-overview[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}.map-overview:disabled,.pan-toggle:disabled{opacity:.65}.map-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:1.5rem}.map-panel{min-width:0}.map-canvas{height:480px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface);position:relative;isolation:isolate;z-index:0}.map-loading{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:2rem;font-size:1rem}.map-caption{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.9rem}.map-caption p,.map-status,.map-noscript{font-size:.875rem;line-height:1.7;margin:0;color:var(--muted)}.map-status{margin-top:.35rem}.pan-toggle{display:none;flex-shrink:0}.neighborhood-list{list-style:none;padding:0;margin:0;display:grid;align-content:start;gap:.7rem}.neighborhood-list li{border:1px solid var(--border);border-radius:6px;background:var(--surface);overflow:hidden}.neighborhood-list button{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--text);padding:1rem 1rem .65rem;font:inherit;border-left:3px solid transparent;min-height:75px}.neighborhood-list button[aria-pressed=true]{border-left-color:var(--accent);background:var(--surface-hover)}.neighborhood-list button:enabled:hover{background:var(--surface-hover)}.neighborhood-list button:disabled{cursor:default}.neighborhood-name{display:block;font-size:1rem;font-weight:500;line-height:1.4}.neighborhood-period{display:block;color:var(--accent);font-size:.875rem;margin-top:.4rem}.neighborhood-list a{display:inline-block;font-size:.875rem;color:var(--muted);margin:0 1rem .8rem;padding:.15rem 0;min-height:28px;text-decoration:underline;text-underline-offset:3px}.neighborhood-list a:hover{color:var(--accent)}.map-canvas :global(.leaflet-container){font-family:var(--sans)}.map-canvas :global(.leaflet-control-attribution){font-family:var(--sans);font-size:.875rem;line-height:1.4;background:var(--surface);color:var(--text);padding:3px 6px}.map-canvas :global(.leaflet-control-attribution a){color:var(--accent)}.map-canvas :global(.leaflet-control-zoom a){background:var(--surface);color:var(--text);border-color:var(--border);width:38px;height:38px;line-height:38px}.map-canvas :global(.leaflet-bar){border:1px solid var(--border)}.map-canvas :global(.leaflet-tooltip),.map-canvas :global(.leaflet-popup-content-wrapper),.map-canvas :global(.leaflet-popup-tip){background:var(--surface);color:var(--text);border-color:var(--border);font-family:var(--sans);font-size:.875rem}.map-canvas :global(.leaflet-tooltip-left:before){border-left-color:var(--surface)}.map-canvas :global(.leaflet-tooltip-right:before){border-right-color:var(--surface)}.map-canvas :global(.leaflet-popup-close-button){color:var(--text)}.map-canvas :global(.leaflet-tile-pane){filter:grayscale(.5) saturate(.55)}:global([data-theme=dark]) .map-canvas :global(.leaflet-tile-pane){filter:grayscale(1) invert(1) brightness(.8) contrast(.9)}.map-unavailable{display:grid;place-items:center;text-align:center;padding:2rem;color:var(--muted)}
+  @media(max-width:900px){.map-layout{grid-template-columns:1fr}.neighborhood-list{grid-template-columns:repeat(2,minmax(0,1fr))}.map-canvas{height:440px}}
+  @media(max-width:600px){.nyc-map-section{padding-top:0}.map-heading{align-items:start}.map-heading h2{font-size:2.2rem}.map-canvas{height:340px}.map-caption{align-items:start;flex-direction:column}.map-canvas :global(.leaflet-control-zoom a){width:44px;height:44px;line-height:44px}.map-canvas :global(.leaflet-tooltip){font-size:.875rem;padding:3px 5px}.neighborhood-list{gap:.6rem}.neighborhood-list button{padding:.85rem .7rem .65rem}.neighborhood-list a{margin-inline:.7rem}.map-overview{white-space:nowrap}}
+  @media(pointer:coarse){.pan-toggle{display:inline-block}}
+</style>
