@@ -74,4 +74,22 @@ collections:
               - { name: heading, label: Page heading, widget: string }
               - { name: topic, label: Matching blog topic, widget: string, hint: 'Posts with this exact topic appear on the interest page.' }
               - { name: description, label: Short description, widget: text }
-              - { name: intro, label: Introduction, widget: text, hint: 'Separate paragraphs with a blank line.' }
+              - { name: intro, label: Introduction, widget: text, hint: 'Separate paragraphs with a blank line. Boxing uses the Boxing journey settings for its timeline.' }
+      - name: boxing-journey
+        label: Boxing journey
+        file: src/data/boxing-journey.json
+        fields:
+          - { name: opening, label: Opening line, widget: text }
+          - name: milestones
+            label: Timeline
+            widget: list
+            summary: '{{fields.period}} — {{fields.title}}'
+            fields:
+              - { name: id, label: Milestone ID, widget: string, hint: 'Keep existing IDs so their photos and videos stay attached. Use a new lowercase ID for a new milestone.' }
+              - { name: period, label: Date or period, widget: string }
+              - { name: title, label: Heading, widget: string }
+              - name: paragraphs
+                label: Paragraphs
+                widget: list
+                field: { name: paragraph, label: Paragraph, widget: text }
+          - { name: instagramUrl, label: Training Instagram link, widget: string }
