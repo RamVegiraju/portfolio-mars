@@ -2,10 +2,11 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { isPublished } from '../../content/publication';
+import { interests } from '../../data/interests.json';
 
 const posts = (await getCollection('posts', ({ data }) => isPublished(data)))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const topics = ['All', 'Life', 'Boxing', 'AI/ML', 'Updates'];
+const topics = ['All', ...new Set(['Life', ...interests.map(interest => interest.topic), 'AI/ML', 'Updates', ...posts.flatMap(post => post.data.topics)])];
 const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
   month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
 });

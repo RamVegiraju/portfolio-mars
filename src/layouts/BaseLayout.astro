@@ -1,10 +1,10 @@
 ---
 import '../styles/global.css';
+import { navigation } from '../data/navigation';
 interface Props { title?: string; description?: string; active?: string; image?: string; imageAlt?: string; type?: 'website' | 'article'; publishedTime?: string; }
 const { title = 'Ram Vegiraju — Work, words & everything else', description = 'A personal home for my work in AI/ML, the videos I make, and thoughts on life and boxing.', active = '', image = '/images/ram-vegiraju.jpg', imageAlt = 'Ram Vegiraju', type = 'website', publishedTime } = Astro.props;
 const pageTitle = title.includes('Ram Vegiraju') ? title : `${title} — Ram Vegiraju`;
 const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
-const nav = [['/', 'Home', 'home'], ['/writing/', 'Writing', 'writing'], ['/videos/', 'Videos', 'videos'], ['/about/', 'About', 'about']];
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -35,7 +35,7 @@ const nav = [['/', 'Home', 'home'], ['/writing/', 'Writing', 'writing'], ['/vide
     <header class="site-header container">
       <a class="wordmark" href="/" aria-label="Ram Vegiraju home">ram<span>.</span></a>
       <nav aria-label="Main navigation">
-        {nav.map(([href,label,key]) => <a href={href} aria-current={active === key ? 'page' : undefined}>{label}</a>)}
+        {navigation.map(({href,title,key}) => <a href={href} aria-current={active === key ? 'page' : undefined}>{title}</a>)}
       </nav>
       <div class="header-actions">
         <a class="resume-link" href="/resume.pdf" target="_blank" rel="noopener">Resume <span class="file-label">PDF</span></a>

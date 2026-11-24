@@ -18,6 +18,6 @@ Most of the writing here will be personal. There is also room for an occasional 
 - **AI/ML:** occasional technical notes and ideas.
 - **Updates:** shorter posts about what is new.
 
-The [video library](/videos/) is home to videos and learning paths. For the professional background, visit [About](/about/) or [read the resume](/resume.pdf).
+The [video library](/videos/) is home to videos and learning paths. For the professional background, visit [Professional](/professional/) or [read the resume](/resume.pdf). [Boxing](/boxing/) has its own space for combat sports and related writing.
 
 This is a short introduction to the site. More writing will follow.

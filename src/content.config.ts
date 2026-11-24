@@ -8,7 +8,7 @@ const posts = defineCollection({
     title: z.string(),
     description: z.string(),
     date: z.coerce.date(),
-    topics: z.array(z.enum(['Life', 'Boxing', 'AI/ML', 'Updates'])).min(1),
+    topics: z.array(z.string().trim().min(1)).min(1),
     draft: z.boolean().default(true),
     image: z.string().optional(),
     imageAlt: z.string().optional(),

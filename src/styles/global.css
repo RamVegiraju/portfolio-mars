@@ -6,3 +6,7 @@
 @media(min-width:1450px){.container{width:min(1240px,calc(100% - 120px))}}
 @media(max-width:760px){.container{width:calc(100% - 40px)}.site-header{min-height:95px;gap:1rem;flex-wrap:wrap;padding-top:1.5rem;padding-bottom:1.2rem}.site-header nav{order:3;width:100%;height:auto;justify-content:space-between;margin:0;padding-top:.8rem;gap:1rem}.site-header nav a{font-size:.875rem}.header-actions{margin-left:auto;gap:1rem}.wordmark{font-size:1.8rem}.section-heading h2{font-size:2.2rem}.section-heading{align-items:center}.site-footer{margin-top:4rem;grid-template-columns:1fr;gap:1rem}.footer-links{flex-wrap:wrap;gap:1.4rem}.page-header{padding-top:3rem}.page-title{font-size:clamp(3rem,12vw,4rem);overflow-wrap:break-word}.lede{font-size:1.05rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Navigation wraps as interests are added; smaller screens get a separate scrollable row. */
+.site-header nav{flex:1;min-width:0;height:auto;min-height:112px;flex-wrap:wrap;justify-content:center;gap:1rem 1.5rem}.site-header nav a{white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:1020px){.site-header{flex-wrap:wrap;padding-block:1.4rem}.site-header nav{order:3;flex-basis:100%;min-height:0;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding:.5rem 0 .8rem;gap:1.6rem}.header-actions{margin-left:auto}.site-header nav a[aria-current=page]::after{bottom:-.4rem}}

@@ -24,11 +24,13 @@ Set `SITE_URL` to the real canonical HTTPS origin before production deployment. 
 
 ## Features and editing
 
-- Home, About, resume download, profile links, and responsive navigation.
+- A concise Home, a dedicated Professional page, and interest tabs starting with Boxing. Includes resume download and profile links.
 - Writing archive with Life, Boxing, AI/ML, and Updates filters; permanent article URLs, RSS, sitemap, and social metadata.
 - Video library with All videos / Learning paths, AWS/Databricks filters, search, incremental display, and ordered playlist pages.
 - Players load on click using privacy-enhanced YouTube embeds; every player has a YouTube fallback link.
 - `/admin/` contains the browser editor. **Live sign-in needs Netlify and a GitHub OAuth app configured**; static Sites preview hosting does not run the Netlify functions.
+
+To add another interest, use **Site settings → Interests and tabs** in the configured editor, or edit `src/data/interests.json`. Set a unique URL name, title, heading, topic, description, and introduction. Publishing the settings generates the new page, tab, and homepage link on the next build. Tag a post with the matching topic to show it on that interest page and in Writing. `/about/` redirects to Home.
 
 Read [blog editing](docs/blog.md), [YouTube syncing](docs/youtube.md), and [production publishing](docs/publishing.md) for the exact workflows. The initial journal introduction is starter copy for review, not a collection of invented personal essays. The example draft is excluded from the public build.
 
@@ -51,8 +53,11 @@ No Google OAuth client is required for public metadata. Never put the key in sou
 
 | File or directory | Purpose |
 | --- | --- |
-| [src/pages/index.astro](src/pages/index.astro) | Homepage, professional introduction, recent writing, featured video. |
-| [src/pages/about.astro](src/pages/about.astro) | Career, education, and personal introduction. |
+| [src/pages/index.astro](src/pages/index.astro) | Short personal introduction, recent writing, featured video, and links to work and interests. |
+| [src/pages/professional.astro](src/pages/professional.astro) | Career, technical focus, education, teaching, and resume links. |
+| [src/pages/[interest].astro](src/pages/[interest].astro) | Generates each interest page with its introduction and matching published posts. |
+| [src/data/interests.json](src/data/interests.json) | Editable interest definitions; each entry creates a page, navigation tab, and homepage link. |
+| [src/data/navigation.ts](src/data/navigation.ts) | Shared primary navigation built from the fixed pages and editable interests. |
 | [src/pages/writing/](src/pages/writing/) | Writing archive and published article routes. |
 | [src/pages/videos/](src/pages/videos/) | Video browser and ordered learning-path pages. |
 | [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) | Shared navigation, metadata, theme toggle, and footer. |

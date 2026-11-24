@@ -4,6 +4,13 @@ import { join, resolve } from 'node:path';
 import assert from 'node:assert/strict';
 
 const output = resolve('dist');
+const { interests } = JSON.parse(await readFile('src/data/interests.json', 'utf8'));
+const slugs = new Set(['home', 'professional', 'writing', 'videos', 'about', 'admin', 'api', '404']);
+for (const interest of interests) {
+  assert(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(interest.slug) && !slugs.has(interest.slug), `Interest URL must be unique and cannot use a reserved route: ${interest.slug}`);
+  for (const field of ['title', 'heading', 'topic', 'description', 'intro']) assert(typeof interest[field] === 'string' && interest[field].trim(), `Interest ${interest.slug}: missing ${field}`);
+  slugs.add(interest.slug);
+}
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   return (await Promise.all(entries.map(entry => entry.isDirectory() ? walk(join(directory, entry.name)) : [join(directory, entry.name)]))).flat();
@@ -12,8 +19,12 @@ const files = await walk(output);
 const htmlFiles = files.filter(file => file.endsWith('.html') && !file.includes('/admin/'));
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
-  assert.equal((html.match(/<main(?:\s|>)/g) || []).length, 1, `${file}: exactly one main landmark`);
-  assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1, `${file}: exactly one page heading`);
+  const redirect = /<meta[^>]+http-equiv="refresh"/i.test(html);
+  if (redirect) assert(file === join(output, 'about', 'index.html') && /url=\//i.test(html), `${file}: unexpected redirect`);
+  else {
+    assert.equal((html.match(/<main(?:\s|>)/g) || []).length, 1, `${file}: exactly one main landmark`);
+    assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1, `${file}: exactly one page heading`);
+  }
   assert(!/AIza[0-9A-Za-z_-]{30,}|art_v2_[0-9A-Za-z_-]+/.test(html), `${file}: credential pattern in public output`);
   for (const match of html.matchAll(/(?:href|src)="(\/[^"\s]*)"/g)) {
     if (match[1].startsWith('//')) continue;

@@ -36,7 +36,7 @@ draft: true
 Write your post here.
 ```
 
-Available topics are `Life`, `Boxing`, `AI/ML`, and `Updates`. Optional fields are `image` (for example `/images/uploads/photo.jpg`) and `imageAlt`. Filenames become permanent URLs such as `/writing/a-new-post/`; avoid renaming published files without adding a redirect.
+Start with topics such as `Life`, `Boxing`, `AI/ML`, and `Updates`. You can also add new topics; the Writing filters include configured interests and topics from published posts. Optional fields are `image` (for example `/images/uploads/photo.jpg`) and `imageAlt`. Filenames become permanent URLs such as `/writing/a-new-post/`; avoid renaming published files without adding a redirect.
 
 Preview locally using the README's commands. Set `draft: false` only when ready, commit the file, and push to `main`. Do not put credentials, private notes, or sensitive image metadata into published content.
 
@@ -51,3 +51,11 @@ node --experimental-strip-types --test src/content/publication.test.mjs
 The test covers published, draft, missing-status, future, and invalid-date entries. Building the site additionally validates all post metadata through Astro's content schema.
 
 References: [Decap GitHub backend](https://decapcms.org/docs/github-backend/), [editorial workflow](https://decapcms.org/docs/editorial-workflows/), [Astro content collections](https://docs.astro.build/en/guides/content-collections/).
+
+## Add an interest and a tab
+
+Open **Site settings → Interests and tabs** in the configured editor. Add an interest with a title, unique URL name, page heading, matching blog topic, short description, and introduction. Save and publish the settings. The next build creates a dedicated page, adds its navigation tab, and links it from Home.
+
+For example, an interest titled `Cooking` with URL name `cooking` and topic `Cooking` creates `/cooking/`. Published posts tagged `Cooking` appear there automatically, while remaining in Writing. Use the same topic spelling and capitalization. Until you publish matching posts, the page shows its introduction and an honest empty state. No duplicate posts are needed.
+
+The same settings can be edited directly in [`src/data/interests.json`](../src/data/interests.json). URL names must be unique, lowercase words separated by hyphens. Reserved page names such as `professional`, `writing`, `videos`, `about`, `admin`, and `api` cannot be used. Avoid changing an existing URL after sharing it. Navigation handles additional tabs by wrapping on desktop and scrolling on smaller screens.

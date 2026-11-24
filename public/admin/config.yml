@@ -42,11 +42,9 @@ collections:
         hint: 'Times are UTC. Future posts appear after the first site build at or after this date.'
       - label: Topics
         name: topics
-        widget: select
-        multiple: true
-        min: 1
-        options: [Life, Boxing, AI/ML, Updates]
+        widget: list
         default: [Life]
+        hint: 'Use Life, Boxing, AI/ML, Updates, or a new topic. Match an interest’s topic exactly to show the post on its page.'
       - label: Draft — hide from website
         name: draft
         widget: boolean
@@ -55,3 +53,25 @@ collections:
       - { label: Cover image, name: image, widget: image, required: false }
       - { label: Cover image description, name: imageAlt, widget: string, required: false, hint: 'Describe meaningful image content for readers using assistive technology.' }
       - { label: Body, name: body, widget: markdown }
+  - name: site
+    label: Site settings
+    files:
+      - name: interests
+        label: Interests and tabs
+        file: src/data/interests.json
+        fields:
+          - name: interests
+            label: Interests
+            widget: list
+            summary: '{{fields.title}}'
+            fields:
+              - { name: title, label: Tab title, widget: string }
+              - name: slug
+                label: URL name
+                widget: string
+                pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase words separated by hyphens.']
+                hint: 'Unique URL, e.g. boxing. Do not use home, professional, writing, videos, about, admin, api, or 404.'
+              - { name: heading, label: Page heading, widget: string }
+              - { name: topic, label: Matching blog topic, widget: string, hint: 'Posts with this exact topic appear on the interest page.' }
+              - { name: description, label: Short description, widget: text }
+              - { name: intro, label: Introduction, widget: text, hint: 'Separate paragraphs with a blank line.' }
