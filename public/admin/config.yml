@@ -80,6 +80,7 @@ collections:
         file: src/data/boxing-journey.json
         fields:
           - { name: opening, label: Opening line, widget: text }
+          - { name: introClosing, label: Intro closing paragraph, widget: text }
           - name: milestones
             label: Timeline
             widget: list

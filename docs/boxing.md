@@ -1,6 +1,6 @@
 # Maintaining the boxing journey
 
-The timeline text lives in [`src/data/boxing-journey.json`](../src/data/boxing-journey.json). Once the browser editor is connected, use **Site settings → Boxing journey** to edit the opening line, milestone periods/headings/paragraphs, or Instagram link. Milestones render in the order listed. The Boxing page heading and short description remain in **Interests and tabs**.
+The timeline text lives in [`src/data/boxing-journey.json`](../src/data/boxing-journey.json). Once the browser editor is connected, use **Site settings → Boxing journey** to edit the opening line, intro closing paragraph, milestone periods/headings/paragraphs, coach note, or Instagram links. Milestones render in the order listed. The Boxing page heading and short description remain in **Interests and tabs**.
 
 Keep the existing milestone IDs when editing: `first-day` attaches the January 2024 photo, `first-sparring` attaches the **late-2024** sparring video and Scrap's coaching note, `getting-serious` attaches the **2025** sparring video, and `putting-in-rounds` attaches the training still and **2026** sparring and mitt-work clips. Adding an ID creates a text milestone. To attach additional media, add the prepared assets and a corresponding media block in `BoxingJourney.astro`.
 
