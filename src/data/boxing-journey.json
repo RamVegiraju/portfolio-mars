@@ -1,13 +1,13 @@
 {
-  "opening": "What started as a hobby became a bit of an addiction, and an outlet I can’t imagine my weeks without now.",
+  "opening": "What started off as a hobby became an addiction and an outlet I can’t imagine my weeks without now.",
   "milestones": [
     {
       "id": "first-day",
       "period": "January 2024",
       "title": "Walking into Church Street.",
       "paragraphs": [
-        "I started boxing in January 2024 at Church Street Boxing Gym in Chelsea. Initially, I just wanted to lose weight. To put it simply, I’d been enjoying New York’s nightlife and food scene way too much and had lost sight of being fit.",
-        "I was also bored of lifting, not that I was ever super elite at it, and wanted to explore an interest I’d always had in combat sports. So I gave boxing a shot."
+        "I started boxing in January 2024 at Church Street Boxing Gym in Chelsea. This initially started off as a journey to lose weight. I’d been, uh, to put it simply, enjoying New York’s nightlife and food scene way too much and lost sight of being fit.",
+        "I was also bored of lifting (not that I was ever super elite there), and I wanted to explore an interest I’d always had in combat sports."
       ]
     },
     {
@@ -46,5 +46,10 @@
       ]
     }
   ],
-  "instagramUrl": "https://www.instagram.com/ramv_boxing/"
+  "instagramUrl": "https://www.instagram.com/ramv_boxing/",
+  "coach": {
+    "name": "Scrap",
+    "instagramUrl": "https://www.instagram.com/scrapologyboxing/",
+    "note": "Meeting him was one of the best things that ever happened to me. He’s as good a coach as you’ll find in the area."
+  }
 }

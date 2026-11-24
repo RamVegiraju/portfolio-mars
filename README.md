@@ -26,7 +26,7 @@ Set `SITE_URL` to the real canonical HTTPS origin before production deployment. 
 
 - A concise Home, a dedicated Professional page, and interest tabs starting with Boxing. Includes resume download and profile links.
 - A portrait-centered homepage map with clickable Professional, Boxing, Writing, Videos, and NYC branches. Connections highlight on hover or keyboard focus; mobile uses a compact linked layout. New interests join the map automatically.
-- Boxing has a personal timeline from January 2024 through the goal of a 2027 amateur fight, including the first-day photo, a 2025 sparring clip, and 2026 sparring/mitt-work clips. Videos use native controls and load only on demand.
+- Boxing has a personal timeline from January 2024 through the goal of a 2027 amateur fight, including the first-day photo, late-2024 and 2025 sparring clips, and 2026 sparring/mitt-work clips. The early clip includes a personal note and Instagram link for coach Scrap. Videos use native controls and load only on demand.
 - Writing archive with Life, Boxing, AI/ML, and Updates filters; permanent article URLs, RSS, sitemap, and social metadata.
 - Video library with All videos / Learning paths, AWS/Databricks filters, search, incremental display, and ordered playlist pages.
 - Players load on click using privacy-enhanced YouTube embeds; every player has a YouTube fallback link.

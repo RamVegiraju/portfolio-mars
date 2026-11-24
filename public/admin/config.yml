@@ -93,3 +93,10 @@ collections:
                 widget: list
                 field: { name: paragraph, label: Paragraph, widget: text }
           - { name: instagramUrl, label: Training Instagram link, widget: string }
+          - name: coach
+            label: Coach
+            widget: object
+            fields:
+              - { name: name, label: Name, widget: string }
+              - { name: instagramUrl, label: Instagram link, widget: string }
+              - { name: note, label: Personal note, widget: text }
