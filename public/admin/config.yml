@@ -1,0 +1,57 @@
+backend:
+  name: github
+  repo: RamVegiraju/portfolio-mars
+  branch: main
+  auth_endpoint: api/auth
+  # base_url is set to the current origin by index.html.
+
+publish_mode: editorial_workflow
+media_folder: public/images/uploads
+public_folder: /images/uploads
+show_preview_links: false
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: '-'
+
+collections:
+  - name: posts
+    label: Writing
+    label_singular: Post
+    folder: src/content/posts
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{slug}}'
+    summary: '{{title}} — {{date}}'
+    sortable_fields: [date, title]
+    view_filters:
+      - label: Drafts hidden from website
+        field: draft
+        pattern: true
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text, hint: 'A short summary for the archive, RSS, and social previews.' }
+      - label: Date
+        name: date
+        widget: datetime
+        format: 'YYYY-MM-DDTHH:mm:ss[Z]'
+        date_format: 'MMM D, YYYY'
+        time_format: 'HH:mm'
+        picker_utc: true
+        hint: 'Times are UTC. Future posts appear after the first site build at or after this date.'
+      - label: Topics
+        name: topics
+        widget: select
+        multiple: true
+        min: 1
+        options: [Life, Boxing, AI/ML, Updates]
+        default: [Life]
+      - label: Draft — hide from website
+        name: draft
+        widget: boolean
+        default: true
+        hint: 'Keep enabled while drafting. Before publishing, turn this off and save, then choose Ready and Publish.'
+      - { label: Cover image, name: image, widget: image, required: false }
+      - { label: Cover image description, name: imageAlt, widget: string, required: false, hint: 'Describe meaningful image content for readers using assistive technology.' }
+      - { label: Body, name: body, widget: markdown }

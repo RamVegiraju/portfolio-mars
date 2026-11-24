@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import VideoCard from '../../components/VideoCard.astro';
+import { videos, learningPaths, channelUrl, hasFreshYouTubeData } from '../../lib/youtube';
+---
+<BaseLayout title="Videos" description="Videos and learning paths on AI, machine learning, AWS, and Databricks by Ram Vegiraju." active="videos">
+  <div class="container video-library">
+    <header class="library-header">
+      <div><p class="eyebrow">Watch & learn</p><h1 class="page-title">A few things,<br /><em>better explained.</em></h1><p class="lede">Practical ideas, walkthroughs, and the occasional deep dive.<br class="desktop-break" /> Explore a single video or follow a learning path.</p></div>
+      <a class="channel-link" href={channelUrl} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.5 7.1a3 3 0 0 0-2.1-2.1C17.5 4.5 12 4.5 12 4.5s-5.5 0-7.4.5A3 3 0 0 0 2.5 7.1 31 31 0 0 0 2 12a31 31 0 0 0 .5 4.9A3 3 0 0 0 4.6 19c1.9.5 7.4.5 7.4.5s5.5 0 7.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 22 12a31 31 0 0 0-.5-4.9ZM10 15.5v-7l6 3.5-6 3.5Z" /></svg> YouTube channel</a>
+    </header>
+
+    <div class="library-tabs" role="tablist" aria-label="Video library view">
+      <button role="tab" aria-selected="true" aria-controls="all-videos" id="all-videos-tab" data-view="all" type="button">All videos <span>{hasFreshYouTubeData ? videos.length : ''}</span></button>
+      <button role="tab" aria-selected="false" aria-controls="learning-paths" id="learning-paths-tab" data-view="paths" tabindex="-1" type="button">Learning paths <span>{learningPaths.length || ''}</span></button>
+    </div>
+
+    <div class="library-toolbar">
+      <div class="platform-filters" role="group" aria-label="Filter by platform"><button type="button" data-platform="all" aria-pressed="true">All topics</button><button type="button" data-platform="AWS" aria-pressed="false">AWS</button><button type="button" data-platform="Databricks" aria-pressed="false">Databricks</button></div>
+      <label class="video-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg><span class="sr-only">Search videos and learning paths</span><input type="search" placeholder="Find something to watch" autocomplete="off" /></label>
+    </div>
+
+    <p class="result-count" aria-live="polite" aria-atomic="true">{hasFreshYouTubeData ? `${videos.length} videos` : 'A selected talk from my work'}</p>
+
+    <section id="all-videos" role="tabpanel" aria-labelledby="all-videos-tab" tabindex="0">
+      <div class="videos-grid">{videos.map((video, index) => <div data-library-item data-kind="all" data-platform={video.platform} data-search={`${video.title} ${video.description}`.toLowerCase()} hidden={index >= 12}><VideoCard video={video} /></div>)}</div>
+      <div class="empty-state" data-empty="all" hidden><h2>Nothing here just yet.</h2><p>Try another topic or search, or explore the full channel.</p><a class="text-link" href={channelUrl} target="_blank" rel="noopener noreferrer">Visit my YouTube channel</a></div>
+      <div class="load-more-wrap"><button class="button" type="button" data-load-more hidden={videos.length <= 12}>Show more videos</button></div>
+      {!hasFreshYouTubeData && <p class="feed-note">You can find more videos on <a href={channelUrl} target="_blank" rel="noopener noreferrer">my YouTube channel</a>.</p>}
+    </section>
+
+    <section id="learning-paths" role="tabpanel" aria-labelledby="learning-paths-tab" tabindex="0" hidden>
+      <noscript><h2 class="section-heading">Learning paths</h2></noscript>
+      <div class="paths-grid">{learningPaths.map(path => <article class="path-card" data-library-item data-kind="paths" data-platform={path.platform} data-search={`${path.title} ${path.description}`.toLowerCase()}>
+        <a class="path-image" href={`/videos/paths/${path.slug}/`} tabindex="-1" aria-hidden="true"><img src={path.thumbnail} alt="" loading="lazy" width="480" height="270" /><span class="path-count">{path.videos.length} videos</span></a>
+        <div class="path-copy"><p class="path-platform">{path.platform} · Learning path</p><h2><a href={`/videos/paths/${path.slug}/`}>{path.title}</a></h2><p class="path-description">{path.description || 'Follow this playlist in order, or jump into the topics that interest you.'}</p><a class="text-link" href={`/videos/paths/${path.slug}/`}>Explore learning path</a></div>
+      </article>)}</div>
+      <div class="empty-state" data-empty="paths" hidden={learningPaths.length > 0}><h2>{learningPaths.length ? 'No matching learning paths.' : 'More ways to learn, coming together.'}</h2><p>{learningPaths.length ? 'Try another platform or search.' : 'AWS and Databricks playlists will appear here as learning paths. In the meantime, explore the channel playlists.'}</p><a class="text-link" href={`${channelUrl}/playlists`} target="_blank" rel="noopener noreferrer">Browse playlists on YouTube</a></div>
+    </section>
+
+    <aside class="channel-footer"><div><p class="eyebrow">Keep exploring</p><h2>There’s more on the channel.</h2><p>Browse the full archive and subscribe for new videos.</p></div><a class="button" href={channelUrl} target="_blank" rel="noopener noreferrer">Visit YouTube</a></aside>
+    <noscript><style is:inline>.library-tabs,.library-toolbar,.load-more-wrap{display:none!important}#learning-paths[hidden],.videos-grid [data-library-item][hidden]{display:block!important}#learning-paths{margin-top:60px}</style></noscript>
+  </div>
+</BaseLayout>
+
+<script>
+  import { readLibraryState, selectLibraryItems } from '../../lib/youtube-utils.mjs';
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-view]')];
+  const platformButtons = [...document.querySelectorAll<HTMLButtonElement>('.platform-filters button')];
+  const search = document.querySelector<HTMLInputElement>('.video-search input');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-library-item]')].map(element => ({ element, kind: element.dataset.kind || '', platform: element.dataset.platform || '', search: element.dataset.search || '' }));
+  const count = document.querySelector<HTMLElement>('.result-count');
+  const more = document.querySelector<HTMLButtonElement>('[data-load-more]');
+  const initial = readLibraryState(window.location.search);
+  let view = initial.view;
+  let platform = initial.platform;
+  let limit = 12;
+  const update = () => {
+    const query = search?.value.trim().toLowerCase() || '';
+    tabs.forEach(tab => { const active = tab.dataset.view === view; tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1; });
+    document.querySelector<HTMLElement>('#all-videos')!.hidden = view !== 'all';
+    document.querySelector<HTMLElement>('#learning-paths')!.hidden = view !== 'paths';
+    platformButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.platform === platform)));
+    const { matching, visible, hasMore } = selectLibraryItems(items, { view, platform, query, limit });
+    items.forEach(item => { item.element.hidden = !visible.includes(item); });
+    document.querySelectorAll<HTMLElement>('[data-empty]').forEach(empty => { empty.hidden = empty.dataset.empty !== view || matching.length > 0; });
+    if (count) count.textContent = `${matching.length} ${view === 'all' ? (matching.length === 1 ? 'video' : 'videos') : (matching.length === 1 ? 'learning path' : 'learning paths')}${platform !== 'all' ? ` · ${platform}` : ''}`;
+    if (more) more.hidden = !hasMore;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view'); url.searchParams.delete('platform');
+    if (view !== 'all') url.searchParams.set('view', view);
+    if (platform !== 'all') url.searchParams.set('platform', platform);
+    history.replaceState(null, '', url);
+  };
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => { view = tab.dataset.view!; limit = 12; update(); });
+    tab.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[next].click(); tabs[next].focus();
+    });
+  });
+  platformButtons.forEach(button => button.addEventListener('click', () => { platform = button.dataset.platform!; limit = 12; update(); }));
+  search?.addEventListener('input', () => { limit = 12; update(); });
+  more?.addEventListener('click', () => { limit += 12; update(); });
+  update();
+</script>
+
+<style>
+  .video-library { padding-top: 76px; padding-bottom: 40px; }
+  .library-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; margin-bottom: 68px; }
+  .page-title em { font-weight: 400; color: var(--accent); }
+  .channel-link { display: flex; align-items: center; gap: 9px; flex-shrink: 0; color: var(--muted); font-size: .9375rem; text-decoration: none; padding-bottom: 8px; }
+  .channel-link:hover { color: var(--accent); }
+  .channel-link svg { width: 24px; height: 24px; }
+  .library-tabs { display: flex; gap: 34px; border-bottom: 1px solid var(--border); }
+  .library-tabs button { display: flex; gap: 10px; align-items: center; padding: 0 0 20px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: inherit; cursor: pointer; margin-bottom: -1px; }
+  .library-tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .library-tabs span { color: var(--muted); font-size: .875rem; }
+  .library-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 30px 0 0; }
+  .platform-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .platform-filters button { padding: 8px 15px; border: 1px solid var(--border); border-radius: 99px; color: var(--muted); background: transparent; font: inherit; font-size: .875rem; cursor: pointer; }
+  .platform-filters button[aria-pressed="true"] { color: var(--bg); border-color: var(--accent); background: var(--accent); }
+  .video-search { display: flex; align-items: center; gap: 9px; border-bottom: 1px solid var(--border); color: var(--muted); padding: 8px 0; width: 255px; }
+  .video-search svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .video-search input { min-width: 0; width: 100%; background: transparent; border: 0; color: var(--text); font: inherit; font-size: .875rem; }
+  .video-search input::placeholder { color: var(--muted); }
+  .result-count { font-size: .875rem; color: var(--muted); margin: 24px 0; }
+  .videos-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 26px; }
+  .paths-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
+  .path-card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .path-image { display: block; aspect-ratio: 16 / 9; position: relative; overflow: hidden; background: var(--surface); }
+  .path-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .path-count { position: absolute; bottom: 14px; right: 14px; background: #10151de6; padding: 5px 10px; color: white; border-radius: 3px; font-size: .875rem; }
+  .path-copy { padding: 26px; }
+  .path-platform { margin: 0; font-size: .875rem; color: var(--accent); }
+  .path-copy h2 { margin: 14px 0; font-size: 1.6rem; line-height: 1.3; }
+  .path-copy h2 a { text-decoration: none; color: var(--text); }
+  .path-copy h2 a:hover { color: var(--accent); }
+  .path-description { color: var(--muted); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 24px; }
+  .load-more-wrap { display: flex; justify-content: center; margin-top: 42px; }
+  .empty-state { padding: 60px 24px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+  .empty-state h2 { margin: 0 0 14px; font-size: 1.75rem; }
+  .empty-state p { color: var(--muted); margin-bottom: 24px; }
+  .feed-note { color: var(--muted); font-size: .9375rem; text-align: center; }
+  .feed-note a { color: var(--accent); text-underline-offset: 4px; }
+  .channel-footer { margin-top: 85px; padding: 38px 0; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .channel-footer h2 { margin: 10px 0; font-size: 1.8rem; }
+  .channel-footer p:last-child { color: var(--muted); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 980px) { .videos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 650px) { .video-library { padding-top: 44px; } .library-header { display: block; margin-bottom: 40px; } .channel-link { margin-top: 26px; } .desktop-break { display: none; } .library-toolbar { align-items: flex-start; flex-direction: column; gap: 18px; } .video-search { width: 100%; } .videos-grid,.paths-grid { grid-template-columns: 1fr; gap: 34px; } .library-tabs { gap: 24px; } .channel-footer { align-items: flex-start; flex-direction: column; margin-top: 56px; } }
+</style>

@@ -1,0 +1,47 @@
+name: Refresh YouTube library
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: youtube-library
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Refresh public video and playlist metadata
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ]; then
+            echo "Add the YOUTUBE_API_KEY repository secret before running this workflow."
+            exit 1
+          fi
+          npm run sync:youtube
+      - name: Commit refreshed library
+        run: |
+          git add src/data/youtube.generated.json
+          if git diff --cached --quiet; then
+            echo "YouTube metadata is unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "🔧 chore(youtube): refresh video library" -m "Reviewed-by: uc-skills-demo"
+          git push origin HEAD:main

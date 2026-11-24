@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isPublished } from '../../content/publication';
+
+const posts = (await getCollection('posts', ({ data }) => isPublished(data)))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const topics = ['All', 'Life', 'Boxing', 'AI/ML', 'Updates'];
+const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
+  month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+});
+---
+
+<BaseLayout title="Writing" description="Personal writing, boxing, updates, and occasional notes on AI and machine learning by Ram Vegiraju." active="writing">
+  <section class="container writing-header">
+    <p class="eyebrow">THE JOURNAL</p>
+    <h1 class="page-title">A little room<br />to think out loud.</h1>
+    <p class="lede">Life, boxing, and the things I’m learning along the way.<br class="wide-only" /> With the occasional detour into AI and machine learning.</p>
+    <a class="rss-link text-link" href="/rss.xml">Subscribe via RSS</a>
+  </section>
+
+  <section class="container archive" aria-label="Writing archive">
+    <div class="archive-toolbar">
+      <div class="topic-filters" role="group" aria-label="Filter writing by topic">
+        {topics.map((topic) => <button type="button" class:list={['topic-filter', { selected: topic === 'All' }]} data-topic={topic} aria-pressed={topic === 'All'}>{topic}</button>)}
+      </div>
+      <p class="post-count" aria-live="polite"><span id="visible-count">{posts.length}</span> <span id="count-label">{posts.length === 1 ? 'entry' : 'entries'}</span></p>
+    </div>
+    <div class="post-list">
+      {posts.map((post) => (
+        <article class="post-row" data-topics={JSON.stringify(post.data.topics)}>
+          <div class="post-date"><time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time></div>
+          <div class="post-summary">
+            <div class="post-topics">{post.data.topics.map((topic) => <span>{topic}</span>)}</div>
+            <h2><a href={`/writing/${post.id}/`}>{post.data.title}</a></h2>
+            <p>{post.data.description}</p>
+          </div>
+          <a class="read-entry text-link" href={`/writing/${post.id}/`} aria-label={`Read ${post.data.title}`}>Read entry</a>
+        </article>
+      ))}
+    </div>
+    <div id="empty-state" class="empty-state" hidden>
+      <h2>A little more to come.</h2>
+      <p>No entries in this topic yet. Explore another topic, or check back soon.</p>
+    </div>
+    <aside class="archive-note">
+      <span class="note-mark" aria-hidden="true">✳</span>
+      <div><h2>Elsewhere, in the meantime</h2><p>You can also find my previous writing on <a href="https://ram-vegiraju.medium.com/" target="_blank" rel="noopener noreferrer">Medium</a> and my technical work on <a href="https://github.com/RamVegiraju" target="_blank" rel="noopener noreferrer">GitHub</a>.</p></div>
+    </aside>
+  </section>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.topic-filter');
+  const entries = document.querySelectorAll<HTMLElement>('.post-row');
+  function filterTopic(topic: string) {
+    let count = 0;
+    entries.forEach((entry) => {
+      const matches = topic === 'All' || JSON.parse(entry.dataset.topics || '[]').includes(topic);
+      entry.hidden = !matches;
+      if (matches) count++;
+    });
+    buttons.forEach((button) => {
+      const active = button.dataset.topic === topic;
+      button.setAttribute('aria-pressed', String(active));
+      button.classList.toggle('selected', active);
+    });
+    document.getElementById('visible-count')!.textContent = String(count);
+    document.getElementById('count-label')!.textContent = count === 1 ? 'entry' : 'entries';
+    document.getElementById('empty-state')!.hidden = count !== 0;
+  }
+  buttons.forEach((button) => button.addEventListener('click', () => filterTopic(button.dataset.topic || 'All')));
+  const requested = new URLSearchParams(window.location.search).get('topic');
+  if (requested && [...buttons].some((button) => button.dataset.topic === requested)) filterTopic(requested);
+</script>
+
+<style>
+  .writing-header{padding-top:5.5rem;padding-bottom:3.5rem}.writing-header .lede{max-width:42rem;margin-top:1.5rem}.rss-link{display:inline-block;margin-top:1.5rem;font-size:.9rem}.archive{padding-bottom:6rem}.archive-toolbar{border-top:1px solid var(--border,#34404e);border-bottom:1px solid var(--border,#34404e);padding:1.15rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem}.topic-filters{display:flex;gap:.5rem;flex-wrap:wrap}.topic-filter{font:inherit;font-size:.9rem;color:var(--muted,#A8B3C2);padding:.55rem .9rem;border:1px solid transparent;border-radius:999px;background:transparent;cursor:pointer}.topic-filter:hover{color:var(--text,#E9EDF2);background:var(--surface,#1A2330)}.topic-filter.selected{color:var(--accent,#E8A87C);border-color:var(--accent,#E8A87C);background:transparent}.post-count{font-size:.875rem;color:var(--muted,#A8B3C2);white-space:nowrap;margin:0}.post-row{display:grid;grid-template-columns:10rem 1fr auto;align-items:center;gap:1rem;padding:2.4rem 0;border-bottom:1px solid var(--border,#34404e)}.post-row[hidden]{display:none}.post-date{align-self:start;padding-top:.25rem;color:var(--muted,#A8B3C2);font-size:.875rem}.post-topics{display:flex;gap:.75rem;color:var(--accent,#E8A87C);font-size:.875rem;letter-spacing:.06em;text-transform:uppercase}.post-summary h2{font-family:var(--serif,Georgia,serif);font-weight:400;font-size:1.8rem;line-height:1.3;margin:.5rem 0}.post-summary h2 a{text-decoration:none;color:var(--text,#E9EDF2)}.post-summary h2 a:hover{color:var(--accent,#E8A87C)}.post-summary p{margin:0;max-width:40rem;color:var(--muted,#A8B3C2);line-height:1.7}.read-entry{font-size:.875rem;white-space:nowrap}.empty-state{padding:4rem 1rem;text-align:center;border-bottom:1px solid var(--border,#34404e)}.empty-state[hidden]{display:none}.empty-state h2{font:400 1.8rem var(--serif,Georgia,serif);margin:0 0 .75rem}.empty-state p{color:var(--muted,#A8B3C2)}.archive-note{margin-top:3.5rem;padding:1.75rem 2rem;display:flex;gap:1.25rem;align-items:start;border-radius:4px;background:var(--surface,#1A2330)}.note-mark{font-size:2rem;color:var(--accent,#E8A87C);line-height:1}.archive-note h2{font-size:1rem;font-weight:500;margin:0 0 .5rem}.archive-note p{font-size:.95rem;line-height:1.7;color:var(--muted,#A8B3C2);margin:0}.archive-note a{color:var(--text,#E9EDF2);text-underline-offset:.2em}@media(max-width:700px){.writing-header{padding-top:3rem;padding-bottom:2.5rem}.wide-only{display:none}.post-row{grid-template-columns:1fr;gap:.8rem;padding:1.8rem 0}.post-date{font-size:.875rem}.post-summary h2{font-size:1.5rem}.read-entry{justify-self:start}.archive-toolbar{align-items:start}.post-count{padding-top:.65rem}.topic-filter{padding:.5rem .65rem}.archive-note{padding:1.5rem;gap:1rem}}
+</style>
